@@ -86,6 +86,42 @@ def solve(grid, actions):
     ans = calculate_distances(grid)
     print(ans)
 
+
+def execute_action2(grid, action, pos):
+    cur_dir = None
+    if action == '>':
+        cur_dir = [0, 1]
+    elif action == '<':
+        cur_dir = [0, -1]
+    elif action == '^':
+        cur_dir = [-1, 0]
+    else:
+        cur_dir = [1, 0]
+    
+    npos, ret = move2(pos[0], pos[1], cur_dir, grid, "@")
+    if ret:
+        grid[pos[0]][pos[1]] = "."
+        pos = npos
+    
+    return pos
+
+def move2(x, y, cur_dir, grid, token):
+    nx, ny = x + cur_dir[0], y + cur_dir[1]
+    if nx < 0 or nx >= len(grid) or ny < 0 or ny >= len(grid[0]):
+        return (x, y), False
+    if grid[nx][ny] == "#":
+        return (x, y), False
+    
+    if grid[nx][ny] == "[]":
+        if move2(nx, ny, cur_dir, grid, 'O')[-1]:
+            grid[nx][ny] = token
+            return (nx, ny), True
+    elif grid[nx][ny] == ".":
+        grid[nx][ny] = token
+        return (nx, ny), True
+    return (x, y), False
+
+
 def solve2(grid, actions):
     # updating grid according to ps2
     new_grid = []
@@ -94,6 +130,8 @@ def solve2(grid, actions):
         for j in range(len(grid[i])):
             if grid[i][j] == '@':
                 row.extend(['@', '.'])
+            elif grid[i][j] == 'O':
+                row.extend(['[', ']'])
             else:
                 row.extend([grid[i][j]] * 2)
 
@@ -112,7 +150,7 @@ def solve2(grid, actions):
         break
 
     for action in tqdm(actions):
-        spos = execute_action(grid, action, spos)
+        spos = execute_action2(grid, action, spos)
     
     print_grid(grid)
     
